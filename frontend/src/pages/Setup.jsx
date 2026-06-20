@@ -2,13 +2,13 @@ import StepGuide from '../components/StepGuide'
 
 export default function Setup() {
   const chatgptSetup = {
-    title: 'ChatGPT API Setup',
+    title: 'Gemini API Setup',
     steps: [
-      { text: 'Create an account at platform.openai.com and navigate to the API keys page.', code: 'https://platform.openai.com/api-keys' },
+      { text: 'Create an account at aistudio.google.com and get an API key.', code: 'https://aistudio.google.com/apikey' },
       { text: 'Create a new secret key and copy it immediately.' },
-      { text: 'Create a .env file in your project root and add your key.', code: 'OPENAI_API_KEY=sk-proj-your-key-here' },
-      { text: 'Install the OpenAI Python package.', code: 'pip install openai' },
-      { text: 'Test your setup with a simple completion request.', code: `from openai import OpenAI\nimport os\nfrom dotenv import load_dotenv\n\nload_dotenv()\nclient = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))\n\nresponse = client.chat.completions.create(\n  model="gpt-4o",\n  messages=[{"role": "user", "content": "Hello!"}]\n)\nprint(response.choices[0].message.content)` },
+      { text: 'Create a .env file in your project root and add your key.', code: 'GEMINI_API_KEY=your-key-here' },
+      { text: 'Install the Google Generative AI Python package.', code: 'pip install google-generativeai' },
+      { text: 'Test your setup with a simple completion request.', code: `import google.generativeai as genai\nimport os\nfrom dotenv import load_dotenv\n\nload_dotenv()\ngenai.configure(api_key=os.getenv("GEMINI_API_KEY"))\n\nmodel = genai.GenerativeModel("gemini-2.0-flash")\nresponse = model.generate_content("Hello!")\nprint(response.text)` },
     ],
   }
 

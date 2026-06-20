@@ -6,9 +6,9 @@ export default function Security() {
     title: 'API Key Best Practices',
     steps: [
       { text: 'Never hardcode API keys in your source code. Always use environment variables.' },
-      { text: 'Create a .env file in your project root (add to .gitignore immediately):', code: `# .env\nOPENAI_API_KEY=sk-proj-your-key-here\nANTHROPIC_API_KEY=sk-ant-your-key-here\nGOOGLE_API_KEY=your-gemini-key-here` },
+      { text: 'Create a .env file in your project root (add to .gitignore immediately):', code: `# .env\nGEMINI_API_KEY=your-key-here\nANTHROPIC_API_KEY=sk-ant-your-key-here` },
       { text: 'Add .env to your .gitignore to prevent accidental commits:', code: `# .gitignore\n.env\n*.env\n.env.local\n.env.*.local` },
-      { text: 'Load environment variables in Python:', code: `from dotenv import load_dotenv\nimport os\n\nload_dotenv()\n\napi_key = os.getenv("OPENAI_API_KEY")\nif not api_key:\n    raise ValueError("OPENAI_API_KEY not set")` },
+      { text: 'Load environment variables in Python:', code: `from dotenv import load_dotenv\nimport os\n\nload_dotenv()\n\napi_key = os.getenv("GEMINI_API_KEY")\nif not api_key:\n    raise ValueError("GEMINI_API_KEY not set")` },
       { text: 'Use a secrets manager in production (e.g., Google Secret Manager, AWS Secrets Manager, HashiCorp Vault).' },
     ],
   }

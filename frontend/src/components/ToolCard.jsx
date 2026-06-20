@@ -4,11 +4,11 @@ import CodeBlock from './CodeBlock'
 const toolDetails = {
   chatgpt: {
     name: 'ChatGPT',
-    desc: 'OpenAI\'s conversational AI model with GPT-4o',
+    desc: 'OpenAI\'s conversational AI model with GPT-4o (backend uses Gemini)',
     badge: 'Hot',
     category: 'LLMs',
     install: 'pip install openai',
-    code: `from openai import OpenAI\n\nclient = OpenAI(api_key="sk-...")\n\nresponse = client.chat.completions.create(\n  model="gpt-4o",\n  messages=[\n    {"role": "user", "content": "Hello!"}\n  ]\n)\nprint(response.choices[0].message.content)`,
+    code: `import google.generativeai as genai\n\ngenai.configure(api_key="YOUR_API_KEY")\n\nmodel = genai.GenerativeModel("gemini-2.0-flash")\nresponse = model.generate_content("Hello!")\nprint(response.text)`,
     docs: 'https://platform.openai.com/docs',
   },
   claude: {

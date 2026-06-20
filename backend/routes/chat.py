@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from openai import OpenAI
+import google.generativeai as genai
 from dotenv import load_dotenv
 import os
 
@@ -8,7 +8,7 @@ load_dotenv()
 
 router = APIRouter()
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 SYSTEM_PROMPT = """You are Aiden, an expert AI developer assistant. You have deep knowledge of:
 - ChatGPT, Claude, Gemini, Ollama — LLM usage and API integration
@@ -25,26 +25,20 @@ class ChatRequest(BaseModel):
     message: str
     history: list = []
 
-class Message(BaseModel):
-    role: str
-    content: str
-
 @router.post("/chat")
 def chat(request: ChatRequest):
     try:
-        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-        for msg in request.history:
-            messages.append({"role": msg.get("role", "user"), "content": msg.get("content", "")})
-        messages.append({"role": "user", "content": request.message})
+        model = genai.GenerativeModel("gemini-2.0-flash")
+        history = []
+        if request.history:
+            for msg in request.history:
+                role = "model" if msg.get("role") == "assistant" else "user"
+                history.append({"role": role, "parts": [msg.get("content", "")]})
 
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=messages,
-            temperature=0.7,
-            max_tokens=2048,
-        )
+        chat_session = model.start_chat(history=history)
+        full_prompt = f"{SYSTEM_PROMPT}\n\nUser: {request.message}"
+        response = chat_session.send_message(full_prompt)
 
-        reply = response.choices[0].message.content
-        return {"reply": reply}
+        return {"reply": response.text}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

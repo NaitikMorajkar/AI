@@ -1,6 +1,6 @@
 # AI Tools Hub
 
-A web application showcasing AI development tools, LLM APIs, agent frameworks, and security best practices. Built with React + Vite + TailwindCSS (frontend) and Python FastAPI + OpenAI GPT-4o (backend).
+A web application showcasing AI development tools, LLM APIs, agent frameworks, and security best practices. Built with React + Vite + TailwindCSS (frontend) and Python FastAPI + Google Gemini (backend).
 
 ## Project Structure
 
@@ -26,7 +26,7 @@ ai-tools-hub/
 
 - Node.js 18+
 - Python 3.10+
-- OpenAI API key
+- Google Gemini API key
 
 ## Setup
 
@@ -40,7 +40,7 @@ pip install -r requirements.txt
 Create a `.env` file in the `backend/` directory:
 
 ```
-OPENAI_API_KEY=sk-proj-your-key-here
+GEMINI_API_KEY=your-key-here
 ```
 
 Start the backend server:
@@ -66,7 +66,7 @@ The frontend will start at http://localhost:5173.
 - **Setup** — Step-by-step guides for ChatGPT API, Ollama, and pyproject.toml
 - **Agents** — Google ADK scaffold/lint commands and agent code examples
 - **Security** — API key best practices, pre-commit hooks (Gitleaks + Ruff), Semgrep scan commands
-- **ChatBot** — Floating AI assistant "Aiden" powered by GPT-4o, with chat history and quick replies
+- **ChatBot** — Floating AI assistant "Aiden" powered by Gemini 2.0 Flash, with chat history and quick replies
 - **Dark Mode** — Toggle in navbar persists across navigation
 
 ## API Endpoints
