@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="14" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <linearGradient id="mainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6" />
+      <stop offset="40%" stop-color="#8B5CF6" />
+      <stop offset="75%" stop-color="#E879F9" />
+      <stop offset="100%" stop-color="#C026D3" />
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60A5FA" />
+      <stop offset="50%" stop-color="#A78BFA" />
+      <stop offset="100%" stop-color="#D946EF" />
+    </linearGradient>
+    <linearGradient id="glossyOverlay" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.10)" />
+      <stop offset="45%" stop-color="rgba(255,255,255,0.02)" />
+      <stop offset="100%" stop-color="rgba(0,0,0,0.20)" />
+    </linearGradient>
+    <linearGradient id="topHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.06)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Squircle background -->
+  <rect x="0" y="0" width="512" height="512" rx="96" fill="#0A0A0F" />
+
+  <!-- Subtle top-left highlight for 3D depth -->
+  <path d="M 96 0 L 416 0 Q 512 0 512 96 L 512 512 L 0 512 L 0 96 Q 0 0 96 0 Z" fill="url(#topHighlight)" />
+
+  <!-- Top glossy highlight edge -->
+  <path d="M 96 0 L 416 0 Q 512 0 512 96 L 512 220 L 0 220 L 0 96 Q 0 0 96 0 Z" fill="url(#glossyOverlay)" />
+
+  <!-- Ring outer glow -->
+  <path d="M 446.5 366 A 220 220 0 1 0 366 446.5" fill="none" stroke="url(#mainGrad)" stroke-width="24" stroke-linecap="round" opacity="0.12" filter="url(#softGlow)" />
+
+  <!-- Ring arc (gap at bottom-right, 30°–60°) -->
+  <path d="M 446.5 366 A 220 220 0 1 0 366 446.5" fill="none" stroke="url(#ringGrad)" stroke-width="3.5" stroke-linecap="round" />
+
+  <!-- "AI" lettering -->
+  <g filter="url(#glow)">
+    <text x="256" y="292" text-anchor="middle" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="168" font-weight="900" fill="url(#mainGrad)">AI</text>
+  </g>
+
+  <!-- Sparkle 1 -->
+  <g filter="url(#glow)">
+    <path d="M 330 168 L 334 158 L 338 168 L 348 172 L 338 176 L 334 186 L 330 176 L 320 172 Z" fill="url(#mainGrad)" />
+  </g>
+
+  <!-- Sparkle 2 -->
+  <g filter="url(#glow)">
+    <path d="M 365 142 L 368 135 L 371 142 L 378 145 L 371 148 L 368 155 L 365 148 L 358 145 Z" fill="url(#mainGrad)" />
+  </g>
+
+  <!-- Download icon (arrow into tray bracket) -->
+  <g transform="translate(256, 386)" filter="url(#glow)">
+    <path d="M 0 -28 L 0 8 M -14 -4 L 0 8 L 14 -4" fill="none" stroke="url(#mainGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M -26 8 L 26 8 Q 30 8 30 12 L 30 16 Q 30 20 26 20 L -26 20 Q -30 20 -30 16 L -30 12 Q -30 8 -26 8 Z" fill="none" stroke="url(#mainGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <!-- Badge circle at ring gap bottom-right -->
+  <circle cx="366" cy="446.5" r="24" fill="#0A0A0F" stroke="url(#ringGrad)" stroke-width="3" filter="url(#glow)" />
+
+  <!-- Gear icon inside badge -->
+  <g transform="translate(366, 446.5)" filter="url(#glow)">
+    <circle cx="0" cy="0" r="8" fill="none" stroke="url(#mainGrad)" stroke-width="2" />
+    <circle cx="0" cy="0" r="3" fill="url(#mainGrad)" />
+    <circle cx="0" cy="0" r="10.5" fill="none" stroke="url(#mainGrad)" stroke-width="2" stroke-dasharray="2.8 5.45" />
+  </g>
+</svg>
