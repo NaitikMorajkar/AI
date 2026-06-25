@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import SplashScreen from './components/SplashScreen'
 import Navbar from './components/Navbar'
 import ChatBot from './components/ChatBot'
+import Cheese from './components/Cheese'
 import Home from './pages/Home'
 import Tools from './pages/Tools'
 import Setup from './pages/Setup'
@@ -24,7 +25,7 @@ function App() {
   return (
     <div className={darkMode ? 'dark' : ''}>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
-        <Navbar darkMode={darkMode} toggleDark={toggleDark} onChatToggle={() => setChatOpen(true)} />
+        <Navbar darkMode={darkMode} toggleDark={toggleDark} onChatToggle={() => setChatOpen(prev => !prev)} />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/tools" element={<Tools />} />
@@ -33,6 +34,7 @@ function App() {
           <Route path="/security" element={<Security />} />
         </Routes>
         <ChatBot isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+        <Cheese />
       </div>
     </div>
   )

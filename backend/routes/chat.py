@@ -1,44 +1,52 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
-import google.generativeai as genai
-from dotenv import load_dotenv
+from typing import List, Optional
+from groq import Groq
 import os
+from dotenv import load_dotenv
 
 load_dotenv()
 
 router = APIRouter()
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+print("=== CHAT.PY LOADED: GROQ MODE ===")
+key = os.getenv("GROQ_API_KEY", "NOT FOUND")
+print(f"=== GROQ KEY: {key[:15]}... ===")
+client = Groq(api_key=key)
 
-SYSTEM_PROMPT = """You are Aiden, an expert AI developer assistant. You have deep knowledge of:
-- ChatGPT, Claude, Gemini, Ollama — LLM usage and API integration
-- GitHub Copilot, Cursor — AI-powered coding tools
-- LangChain, Google ADK (Agent Development Kit) — agent frameworks
-- pre-commit hooks, Semgrep — code quality and security
-- pyproject.toml — Python project configuration
-- agents-cli — Google ADK CLI tool
-- API key security best practices (.env, .gitignore, never hardcode)
+SYSTEM_PROMPT = """You are Aiden, an expert AI developer assistant inside AI Tools Hub. You also power Cheese, a friendly voice assistant. You have deep knowledge of ChatGPT, Claude, Gemini, Ollama, Copilot, Cursor, LangChain, Google ADK, pre-commit, Semgrep, pyproject.toml, agents-cli, and API key security. Be friendly, concise and helpful. For voice responses keep answers under 3 sentences."""
 
-Provide concise, helpful answers. When showing code, use markdown code blocks."""
+class Message(BaseModel):
+    role: str
+    content: str
 
 class ChatRequest(BaseModel):
     message: str
-    history: list = []
+    history: Optional[List[Message]] = []
 
 @router.post("/chat")
-def chat(request: ChatRequest):
+async def chat(request: ChatRequest):
     try:
-        model = genai.GenerativeModel("gemini-2.0-flash")
-        history = []
-        if request.history:
-            for msg in request.history:
-                role = "model" if msg.get("role") == "assistant" else "user"
-                history.append({"role": role, "parts": [msg.get("content", "")]})
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+        for msg in request.history[-10:]:
+            messages.append({
+                "role": msg.role,
+                "content": msg.content
+            })
+        messages.append({
+            "role": "user",
+            "content": request.message
+        })
 
-        chat_session = model.start_chat(history=history)
-        full_prompt = f"{SYSTEM_PROMPT}\n\nUser: {request.message}"
-        response = chat_session.send_message(full_prompt)
-
-        return {"reply": response.text}
+        print(f"Sending to Groq: {request.message}")
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            max_tokens=1024,
+            messages=messages
+        )
+        reply = response.choices[0].message.content
+        print(f"Groq replied: {reply[:50]}...")
+        return {"reply": reply}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"ERROR: {str(e)}")
+        return {"reply": f"Error: {str(e)}"}
