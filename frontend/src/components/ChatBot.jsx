@@ -40,6 +40,7 @@ export default function ChatBot({ isOpen, onClose }) {
   }, [isOpen, onClose])
 
   const sendMessage = async (text) => {
+    const API_URL = "https://ai-tools-hub-backend.vercel.app"
     const userMsg = { role: 'user', content: text }
     const updated = [...messages, userMsg]
     setMessages(updated)
@@ -51,7 +52,7 @@ export default function ChatBot({ isOpen, onClose }) {
     }, 15000)
 
     try {
-      const res = await fetch('http://localhost:8000/api/chat', {
+      const res = await fetch(`${API_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

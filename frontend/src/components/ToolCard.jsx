@@ -76,7 +76,7 @@ const toolDetails = {
   },
 }
 
-export default function ToolCard({ id, onSelect }) {
+export default function ToolCard({ id, onSelect, onClick }) {
   const tool = toolDetails[id]
   if (!tool) return null
 
@@ -87,8 +87,19 @@ export default function ToolCard({ id, onSelect }) {
     Free: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
   }
 
+  const handleClick = () => {
+    if (onClick) {
+      onClick(id)
+    } else {
+      onSelect?.(id)
+    }
+  }
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-lg transition-shadow">
+    <div
+      onClick={handleClick}
+      className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 hover:shadow-lg transition-shadow cursor-pointer"
+    >
       <div className="flex items-start justify-between mb-3">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{tool.name}</h3>
         {tool.badge && (
@@ -99,7 +110,7 @@ export default function ToolCard({ id, onSelect }) {
       </div>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{tool.desc}</p>
       <button
-        onClick={() => onSelect?.(id)}
+        onClick={(e) => { e.stopPropagation(); onSelect?.(id) }}
         className="text-primary hover:text-primary-600 text-sm font-medium transition-colors"
       >
         View Details →

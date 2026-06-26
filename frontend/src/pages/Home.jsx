@@ -53,7 +53,7 @@ export default function Home() {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8">Latest AI Tools</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {featuredTools.map(id => (
-            <ToolCard key={id} id={id} />
+            <ToolCard key={id} id={id} onClick={(toolId) => navigate(`/tools/${toolId}`)} />
           ))}
         </div>
       </section>

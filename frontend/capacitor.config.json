@@ -1,0 +1,9 @@
+{
+  "appId": "com.naitik.aitoolshub",
+  "appName": "AI Tools Hub",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  }
+}

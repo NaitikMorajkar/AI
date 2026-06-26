@@ -4,7 +4,7 @@ const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecogni
 
 const SYSTEM_PROMPT = `You are Cheese, a warm and friendly voice AI assistant inside AI Tools Hub. You talk like a real human — not a robot. Be conversational, use natural language, and sound like you're genuinely having a chat. Keep responses concise (2-4 sentences) since they're spoken out loud, but make them feel human: use contractions, vary your tone, and avoid robotic phrasing. You have deep knowledge of AI tools, LLMs, agents, pre-commit, Semgrep, ADK, CLI tools, API keys, and developer workflows. Be helpful, slightly playful, and always accurate. Never start responses with phrases like "As an AI" or "I'm here to" — just answer naturally.`
 
-const API_URL = 'http://localhost:8000/api/chat'
+const API_URL = "https://ai-tools-hub-backend.vercel.app"
 const MAX_HISTORY = 10
 
 function playActivationSound() {
@@ -109,6 +109,10 @@ export default function Cheese() {
       recognitionRef.current = null
     }
     clearTimeout(silenceTimerRef.current)
+    if (window.cheeseStream) {
+      window.cheeseStream.getTracks().forEach(t => t.stop())
+      window.cheeseStream = null
+    }
   }
 
   const handleTap = useCallback(() => {
@@ -147,14 +151,15 @@ export default function Cheese() {
     setStatus('listening')
 
     const recognition = new SpeechRecognition()
-    recognition.continuous = false
+    recognition.continuous = true
     recognition.interimResults = true
     recognition.lang = 'en-US'
-    recognition.maxAlternatives = 1
+    recognition.maxAlternatives = 3
 
     recognitionRef.current = recognition
 
     let finalTranscript = ''
+    let intentionalStop = false
 
     recognition.onresult = (event) => {
       let interim = ''
@@ -170,35 +175,67 @@ export default function Cheese() {
       clearTimeout(silenceTimerRef.current)
       silenceTimerRef.current = setTimeout(() => {
         if (finalTranscript.trim().length > 0) {
+          intentionalStop = true
           recognition.stop()
         }
       }, 1500)
     }
 
-    recognition.onerror = (e) => {
-      if (e.error === 'aborted' || e.error === 'no-speech') {
+    recognition.onerror = (event) => {
+      console.log('Speech error:', event.error)
+      if (event.error === 'no-speech') {
+        setTimeout(() => {
+          try { recognition.start() } catch (e) { console.log('Restart error:', e) }
+        }, 500)
+      } else if (event.error === 'aborted') {
         resetToIdle()
-        return
+      } else {
+        setError(`Mic error: ${event.error}`)
+        resetToIdle()
       }
-      setError(`Mic error: ${e.error}`)
-      resetToIdle()
     }
 
     recognition.onend = () => {
       clearTimeout(silenceTimerRef.current)
       if (statusRef.current !== 'listening') return
-      if (finalTranscript.trim().length > 0) {
-        sendToBackend(finalTranscript.trim())
+      if (intentionalStop) {
+        if (finalTranscript.trim().length > 0) {
+          sendToBackend(finalTranscript.trim())
+        } else {
+          resetToIdle()
+        }
       } else {
+        setTimeout(() => {
+          try { recognition.start() } catch (e) { console.log('Restart error:', e) }
+        }, 500)
+      }
+    }
+
+    const startRecognition = () => {
+      try {
+        recognition.start()
+      } catch (e) {
+        setError('Could not start microphone.')
         resetToIdle()
       }
     }
 
-    try {
-      recognition.start()
-    } catch (e) {
-      setError('Could not start microphone.')
-      resetToIdle()
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        }
+      }).then(stream => {
+        window.cheeseStream = stream
+        startRecognition()
+      }).catch(err => {
+        console.log('Mic error:', err)
+        startRecognition()
+      })
+    } else {
+      startRecognition()
     }
   }
 
@@ -217,7 +254,7 @@ export default function Cheese() {
     historyRef.current = updatedHistory
 
     try {
-      const res = await fetch(API_URL, {
+      const response = await fetch(`${API_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -226,18 +263,20 @@ export default function Cheese() {
           system_prompt: SYSTEM_PROMPT,
         }),
       })
-      const data = await res.json()
+      console.log('Response status:', response.status)
+      const data = await response.json()
+      console.log('Cheese got reply:', data.reply)
       const replyText = data.reply || 'Sorry, I got an empty response.'
       historyRef.current = [...updatedHistory, { role: 'assistant', content: replyText }]
       speakText(replyText)
-    } catch {
-      const err = 'Sorry, I could not reach the server. Make sure the backend is running!'
-      speakText(err)
+    } catch (error) {
+      console.log('Fetch error:', error)
+      speakText('Sorry, I could not connect to the server')
     }
   }
 
   const speakText = (text) => {
-    synth.cancel()
+    window.speechSynthesis.cancel()
     setReply(text)
     statusRef.current = 'speaking'
     setStatus('speaking')
@@ -245,8 +284,9 @@ export default function Cheese() {
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.rate = 0.95
     utterance.pitch = 1.1
+    utterance.lang = 'en-US'
 
-    const voices = synth.getVoices()
+    const voices = window.speechSynthesis.getVoices()
     const preferred = voices.find(v => /female/i.test(v.name) && v.lang.startsWith('en'))
       || voices.find(v => v.lang.startsWith('en'))
       || voices[0]
@@ -256,7 +296,7 @@ export default function Cheese() {
     utterance.onerror = () => resetToIdle()
 
     utteranceRef.current = utterance
-    synth.speak(utterance)
+    window.speechSynthesis.speak(utterance)
   }
 
   const statusLabel = {

@@ -1,0 +1,10 @@
+{
+  "experimentalServices": {
+    "backend": {
+      "root": "backend",
+      "entrypoint": "main:app",
+      "routePrefix": "/",
+      "buildCommand": "pip install -r requirements.txt"
+    }
+  }
+}

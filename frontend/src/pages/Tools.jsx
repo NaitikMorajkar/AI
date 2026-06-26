@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useParams } from 'react-router-dom'
 import ToolCard, { ToolDetail } from '../components/ToolCard'
 
 const toolIds = ['chatgpt', 'claude', 'gemini', 'ollama', 'copilot', 'cursor', 'adk', 'langchain']
@@ -32,6 +32,7 @@ const toolDetails = {
 
 export default function Tools() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const { toolId } = useParams()
   const [activeFilter, setActiveFilter] = useState('')
   const [selectedTool, setSelectedTool] = useState(null)
 
@@ -42,6 +43,12 @@ export default function Tools() {
       if (matched) setActiveFilter(matched)
     }
   }, [searchParams])
+
+  useEffect(() => {
+    if (toolId) {
+      setSelectedTool(toolId)
+    }
+  }, [toolId])
 
   const filtered = toolIds.filter(id => {
     const info = toolDetails[id]

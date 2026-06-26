@@ -28,6 +28,7 @@ function App() {
         <Navbar darkMode={darkMode} toggleDark={toggleDark} onChatToggle={() => setChatOpen(prev => !prev)} />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/tools/:toolId" element={<Tools />} />
           <Route path="/tools" element={<Tools />} />
           <Route path="/setup" element={<Setup />} />
           <Route path="/agents" element={<Agents />} />
