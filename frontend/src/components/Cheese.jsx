@@ -250,52 +250,36 @@ export default function Cheese() {
 
     const userMsg = { role: 'user', content: text }
     const currentHistory = historyRef.current
-    const updatedHistory = [...currentHistory, userMsg].slice(-MAX_HISTORY)
-    historyRef.current = updatedHistory
+    const conversationHistory = [...currentHistory, userMsg].slice(-MAX_HISTORY)
+    historyRef.current = conversationHistory
 
     try {
       const response = await fetch(`${API_URL}/api/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           message: text,
-          history: updatedHistory.map(m => ({ role: m.role, content: m.content })),
-          system_prompt: SYSTEM_PROMPT,
-        }),
+          history: conversationHistory
+        })
       })
       console.log('Response status:', response.status)
       const data = await response.json()
       console.log('Cheese got reply:', data.reply)
-      const replyText = data.reply || 'Sorry, I got an empty response.'
-      historyRef.current = [...updatedHistory, { role: 'assistant', content: replyText }]
-      speakText(replyText)
-    } catch (error) {
+      speakReply(data.reply)
+    } catch(error) {
       console.log('Fetch error:', error)
-      speakText('Sorry, I could not connect to the server')
+      speakReply("Sorry, I could not connect to the server")
     }
   }
 
-  const speakText = (text) => {
+  const speakReply = (text) => {
     window.speechSynthesis.cancel()
-    setReply(text)
-    statusRef.current = 'speaking'
-    setStatus('speaking')
-
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.rate = 0.95
     utterance.pitch = 1.1
     utterance.lang = 'en-US'
-
-    const voices = window.speechSynthesis.getVoices()
-    const preferred = voices.find(v => /female/i.test(v.name) && v.lang.startsWith('en'))
-      || voices.find(v => v.lang.startsWith('en'))
-      || voices[0]
-    if (preferred) utterance.voice = preferred
-
-    utterance.onend = () => resetToIdle()
-    utterance.onerror = () => resetToIdle()
-
-    utteranceRef.current = utterance
     window.speechSynthesis.speak(utterance)
   }
 
